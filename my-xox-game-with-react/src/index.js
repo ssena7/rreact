@@ -1,107 +1,165 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
-import './index.css';
+import './index.css'
 
-function XoxGameComponent() {
+
+function XoxGameComponent(){
   const [games, setGames] = useState([]);
   const [mark, setMark] = useState("X");
   const [message, setMessage] = useState("");
   const [isGameFinish, setIsGameFinish] = useState(false);
+  const [gameMove, setGameMove] = useState([]);
 
-  useEffect(() => {
+  useEffect(()=> {
     newGame();
-  }, []);
+  }, [])
 
-  const newGame = () => {
-    setGames(["", "", "", "", "", "", "", "", ""]);
+  const newGame = () =>{
+    setGames([
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]);
     setIsGameFinish(false);
     setMark("X");
-    setMessage("Hamle Sırası: X");
-  };
+    setMessage("Hamle Sırası: " + mark);
+    setGameMove([])
+  }
+
+  const markGame = (index) => {
+    if(!isGameFinish){
+    const newGames = [...games];
+    if(newGames[index] == ""){
+      newGames[index] = mark;
+      setGames(newGames);
+      setGameMove((val) => [...val, newGames])      
+      let e = isMoveFinish(newGames);
+      if(e){
+        setMessage("Oyun berabere");
+        setIsGameFinish(true);
+        return;
+      }
+
+      let r = isGameOver(newGames);
+      if(r){
+        setMessage("Oyunu " + mark + " kazandı!");
+        setIsGameFinish(true);
+        return;
+      }
+
+      mark == "X" ? setMark("O") : setMark("X");
+      setMessage("Hamle Sırası: " + (mark == "X"  ? 'O' : 'X'))
+    }
+  }
+  }
 
   const isGameOver = (newGames) => {
-    const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
-
-    for (let line of lines) {
-      const [a, b, c] = line;
-      if (
-        newGames[a] !== "" &&
-        newGames[a] === newGames[b] &&
-        newGames[a] === newGames[c]
-      ) {
-        return true;
-      }
+    if(newGames[0] != "" 
+    && newGames[0] === newGames[1] 
+    && newGames[1] === newGames[2]){
+      return true
     }
-    return false;
-  };
 
-  const isMoveFinish = (newGames) => {
+    if(newGames[3] != "" 
+    && newGames[3] === newGames[4] 
+    && newGames[4] === newGames[5]){
+      return true
+    }
+
+    if(newGames[6] != "" 
+    && newGames[6] === newGames[7] 
+    && newGames[7] === newGames[8]){
+      return true
+    }
+
+    if(newGames[0] != "" 
+    && newGames[0] === newGames[3] 
+    && newGames[3] === newGames[6]){
+      return true
+    }
+
+    if(newGames[1] != "" 
+    && newGames[1] === newGames[4] 
+    && newGames[4] === newGames[7]){
+      return true
+    }
+
+    if(newGames[2] != "" 
+    && newGames[2] === newGames[5] 
+    && newGames[5] === newGames[8]){
+      return true
+    }
+
+    if(newGames[0] != "" 
+    && newGames[0] === newGames[4] 
+    && newGames[4] === newGames[8]){
+      return true
+    }
+
+    if(newGames[2] != "" 
+    && newGames[2] === newGames[4] 
+    && newGames[4] === newGames[6]){
+      return true
+    }
+
+    return false;
+  }
+
+  function isMoveFinish(newGames){
     for (let i = 0; i < newGames.length; i++) {
-      if (newGames[i] === "") {
+      const element = newGames[i];
+      if(element === ""){
         return false;
       }
     }
+
     return true;
-  };
+  }
 
-  const markGame = (index) => {
-    if (!isGameFinish) {
-      const newGames = [...games];
-      if (newGames[index] === "") {
-        newGames[index] = mark;
-        setGames(newGames);
+  const setThatGameMove = (game) => {
+    setGames(game);
+  }
 
-        if (isGameOver(newGames)) {
-          setIsGameFinish(true);
-          setMessage("Oyunu " + mark + " kazandı!");
-          return;
-        }
-
-        if (isMoveFinish(newGames)) {
-          setIsGameFinish(true);
-          setMessage("Oyun Berabere");
-          return;
-        }
-
-        const nextMark = mark === "X" ? "O" : "X";
-        setMark(nextMark);
-        setMessage("Hamle Sırası: " + nextMark);
-      }
-    }
-  };
-
-  return (
-    <div className="container text-center">
-      <h1>XOX Game</h1>
-      <h2 className="alert alert-warning">{message}</h2>
-      <button onClick={newGame} className="btn btn-outline-primary w-100 mb-2">
+  return(
+    <>
+    <div className='container text-center'>
+      <h1>XOX Oyunu</h1>
+      <h2 className='alert alert-warning'>
+        {message}
+      </h2>
+      <button onClick={newGame} className='btn btn-outline-primary w-100'>
         Yeni Oyun
       </button>
-      <div className="row">
+      <div className='row mt-2'>
         {games.map((game, index) => (
           <div
-            key={index}
-            className="col-4 border p-5 fs-1 box"
-            onClick={() => markGame(index)}
-          >
+          key={index}
+          className="col-md-4 box"
+          onClick={()=> markGame(index)}>
             {game}
           </div>
         ))}
       </div>
+      <hr/>
+      {gameMove.map((game, index) => (
+          <button onClick={()=> setThatGameMove(game)} className='btn btn-primary mx-2 mt-2' key={index}>{index + 1}. Hamle</button>
+          
+        ))}
     </div>
-  );
+    </>
+  )
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<XoxGameComponent />);
+root.render(
+  <XoxGameComponent/>
+);
+
 reportWebVitals();
